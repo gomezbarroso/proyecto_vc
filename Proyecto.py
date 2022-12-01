@@ -119,7 +119,7 @@ pose = mp_pose.Pose()
 
 # For webcam input replace file name with 0.
 # file_name = 'output.avi'
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 # Meta.
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -137,7 +137,7 @@ if not success:
 # Get fps.
 fps = cap.get(cv2.CAP_PROP_FPS)
 # Get height and width of the frame.
-h, w = image.shape[:2]
+# h, w = image.shape[:2]
 
 # Convert the BGR image to RGB.
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -150,26 +150,26 @@ image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
 # Body Posture Landmark Coordinates
 mp_pose.Pose().process(image).pose_landmarks
-# norm_coordinate  = pose.process(image).pose_landmark.landmark[mp.solutions.pose.PoseLandmark.LEFT_SHOULDER].coordinate
+# norm_coordinate  = pose.process(image).pose_landmark.landmark[mp.solutions.pose.PoseLandmark.<SPECIFIC_LANDMARK>].coordinate
 
 # Use lm and lmPose as representative of the following methods.
 lm = keypoints.pose_landmarks
 lmPose  = mp_pose.PoseLandmark
 # Left shoulder.
-l_shldr_x = int(lm.landmark[lmPose.LEFT_SHOULDER].x * w)
-l_shldr_y = int(lm.landmark[lmPose.LEFT_SHOULDER].y * h)
+l_shldr_x = int(lm.landmark[lmPose.LEFT_SHOULDER].x * width)
+l_shldr_y = int(lm.landmark[lmPose.LEFT_SHOULDER].y * height)
 
 # Right shoulder.
-r_shldr_x = int(lm.landmark[lmPose.RIGHT_SHOULDER].x * w)
-r_shldr_y = int(lm.landmark[lmPose.RIGHT_SHOULDER].y * h)
+r_shldr_x = int(lm.landmark[lmPose.RIGHT_SHOULDER].x * width)
+r_shldr_y = int(lm.landmark[lmPose.RIGHT_SHOULDER].y * height)
 
 # Left ear.
-l_ear_x = int(lm.landmark[lmPose.LEFT_EAR].x * w)
-l_ear_y = int(lm.landmark[lmPose.LEFT_EAR].y * h)
+l_ear_x = int(lm.landmark[lmPose.LEFT_EAR].x * width)
+l_ear_y = int(lm.landmark[lmPose.LEFT_EAR].y * height)
 
 # Left hip.
-l_hip_x = int(lm.landmark[lmPose.LEFT_HIP].x * w)
-l_hip_y = int(lm.landmark[lmPose.LEFT_HIP].y * h)
+l_hip_x = int(lm.landmark[lmPose.LEFT_HIP].x * width)
+l_hip_y = int(lm.landmark[lmPose.LEFT_HIP].y * height)
 
 
 # Alinear Cámara
@@ -180,9 +180,9 @@ offset = findDistance(l_shldr_x, l_shldr_y, r_shldr_x, r_shldr_y)
 # Assist to align the camera to point at the side view of the person.
 # Offset threshold 30 is based on results obtained from analysis over 100 samples.
 if offset < 100:
-    cv2.putText(image, str(int(offset)) + ' Aligned', (w - 150, 30), font, 0.9, green, 2)
+    cv2.putText(image, str(int(offset)) + ' Aligned', (width - 150, 30), font, 0.9, green, 2)
 else:
-    cv2.putText(image, str(int(offset)) + ' Not Aligned', (w - 150, 30), font, 0.9, red, 2)
+    cv2.putText(image, str(int(offset)) + ' Not Aligned', (width - 150, 30), font, 0.9, red, 2)
 
 
 # Calculate Body Posture Inclination and Draw Landmarks
