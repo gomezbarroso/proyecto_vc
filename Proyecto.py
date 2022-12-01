@@ -119,16 +119,16 @@ pose = mp_pose.Pose()
 
 # For webcam input replace file name with 0.
 # file_name = 'output.avi'
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 # Meta.
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 frame_size = (width, height)
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+fourcc = cv2.VideoWriter_fourcc('I', '4', '2', '0')
 
 # Video writer.
-video_output = cv2.VideoWriter('output.mp4', fourcc, fps, frame_size)
+video_output = cv2.VideoWriter('output.avi', fourcc, fps, frame_size)
 
 # Capture frames.
 success, image = cap.read()
@@ -248,10 +248,10 @@ bad_time =  (1 / fps) * bad_frames
 # Pose time.
 if good_time > 0:
     time_string_good = 'Good Posture Time : ' + str(round(good_time, 1)) + 's'
-    cv2.putText(image, time_string_good, (10, h - 20), font, 0.9, green, 2)
+    cv2.putText(image, time_string_good, (10, height - 20), font, 0.9, green, 2)
 else:
     time_string_bad = 'Bad Posture Time : ' + str(round(bad_time, 1)) + 's'
-    cv2.putText(image, time_string_bad, (10, h - 20), font, 0.9, red, 2)
+    cv2.putText(image, time_string_bad, (10, height - 20), font, 0.9, red, 2)
 
 # If you stay in bad posture for more than 3 minutes (180s) send an alert.
 # if bad_time > 180:
