@@ -70,8 +70,16 @@ while(True):
 
     # Obtener los landmarks de los keypoints
     lm = keypoints.pose_landmarks
-    if lm is not None:
+
+    if lm.landmark[lmPose.LEFT_WRIST].visibility < 0.1:
+        not_found_string = 'Puntos no reconocidos'
+        cv2.putText(image, not_found_string, (10, 30), font, 0.9, red, 2)
+
+    if lm.landmark[lmPose.LEFT_WRIST].visibility >= 0.1:
         lmPose = mp_pose.PoseLandmark
+        #print(lm.landmark[lmPose.LEFT_WRIST])
+
+            
 
         # Muñeca izquierda
         l_wrist_x = int(lm.landmark[lmPose.LEFT_WRIST].x * width)
