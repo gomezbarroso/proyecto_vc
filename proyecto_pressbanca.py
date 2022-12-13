@@ -87,16 +87,9 @@ while(True):
         # Calcular la distancia entre los puntos del hombro izquierdo y el hombro derecho
         offset = findDistance(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
 
-        # Alinear la camara al punto de la vista lateral de la persona
-        # El parametro Offset threshold se ha fijado a 30 tras realizar diferentes pruebas
-        if offset < 100:
-            cv2.putText(image, str(int(offset)) + ' Alineado', (width - 175, 30), font, 0.9, green, 2)
-        else:
-            cv2.putText(image, str(int(offset)) + ' No alineado', (width - 255, 30), font, 0.9, red, 2)
-
         # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
         # Calcular angulos
-        neck_inclination = findAngle(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
+        wrist_inclination = findAngle(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
 
         # Pintar puntos de referencia
         cv2.circle(image, (l_wrist_x, l_wrist_y), 7, yellow, -1)
@@ -105,17 +98,17 @@ while(True):
         cv2.circle(image, (r_wrist_x, r_wrist_y), 7, pink, -1)
 
         # Imprimimos el texto por pantalla, inclinacion de postura y angulos
-        angle_text_string = 'Cuello : ' + str(int(neck_inclination))
+        angle_text_string = 'Angulo de inclinacion con la vertical : ' + str(int(wrist_inclination))
 
         # Condiciones de deteccion de postura corporal
         # Determinar si la postura es buena o no
         # Los angulos del threshold han sido fijados tras varias pruebas
-        if neck_inclination > 83 and neck_inclination < 97 :
+        if wrist_inclination > 83 and wrist_inclination < 97 :
             bad_frames = 0
             good_frames += 1
 
             cv2.putText(image, angle_text_string, (10, 30), font, 0.9, light_green, 2)
-            cv2.putText(image, str(int(neck_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, light_green, 2)
+            cv2.putText(image, str(int(wrist_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, light_green, 2)
             # Union de puntos de referencia
             cv2.line(image, (l_wrist_x, l_wrist_y), (r_wrist_x, r_wrist_y), green, 4)
 
@@ -124,7 +117,7 @@ while(True):
             bad_frames += 1
 
             cv2.putText(image, angle_text_string, (10, 30), font, 0.9, red, 2)
-            cv2.putText(image, str(int(neck_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, red, 2)
+            cv2.putText(image, str(int(wrist_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, red, 2)
 
             # Union de puntos de referencia
             cv2.line(image, (l_wrist_x, l_wrist_y), (r_wrist_x, r_wrist_y), red, 4)
