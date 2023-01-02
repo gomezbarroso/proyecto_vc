@@ -24,7 +24,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 # Definicion de colores
 rojo = (50, 50, 255)
-verde = (127, 255, 0)
+verde = (125, 255, 0)
 verde_claro = (125, 235, 100)
 amarillo = (0, 255, 255)
 rosa = (255, 0, 255)
@@ -74,8 +74,8 @@ while(True):
     lm = keypoints.pose_landmarks
     if lm is not None:
         if lm.landmark[lmPose.LEFT_WRIST].visibility < 0.1:
-            not_found_string = 'Puntos no reconocidos'
-            cv2.putText(image, not_found_string, (10, 30), font, 0.9, rojo, 2)
+            puntos_no_reconocidos = 'Puntos no reconocidos'
+            cv2.putText(image, puntos_no_reconocidos, (10, 30), font, 0.9, rojo, 2)
 
         if lm.landmark[lmPose.LEFT_WRIST].visibility >= 0.1:
             lmPose = mp_pose.PoseLandmark
@@ -104,7 +104,7 @@ while(True):
             hombro_dcha_x = int(lm.landmark[lmPose.RIGHT_SHOULDER].x * width)
             hombro_dcha_y = int(lm.landmark[lmPose.RIGHT_SHOULDER].y * height)
 
-            # Calcular la distancia entre los puntos del hombro izquierdo y el hombro derecho
+            # Calcular la distancia entre los puntos de la muñeca izquierda y la muñeca derecha
             separacion = calc_dist(muneca_izq_x, muneca_izq_y, muneca_dcha_x, muneca_dcha_y)
 
             # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
@@ -122,9 +122,9 @@ while(True):
             cv2.circle(image, (hombro_dcha_x, hombro_dcha_y), 7, rosa, -1)
 
             # Imprimimos el texto por pantalla, inclinacion de postura y angulos
-            angle_text_string = 'Angulo de inclinacion con la vertical : ' + str(int(inclinacion_muneca))
-            l_arm_angle_text_string = 'Angulo de inclinacion brazos (L): ' + str(int(inclinacion_brazo_izq))
-            r_arm_angle_text_string = 'Angulo de inclinacion brazos (R): ' + str(int(inclinacion_brazo_dcha))
+            angulo_string = 'Angulo de inclinacion con la vertical : ' + str(int(inclinacion_muneca))
+            angulo_string_brazo_izq = 'Angulo de inclinacion brazos (izq): ' + str(int(inclinacion_brazo_izq))
+            angulo_string_brazo_dcho = 'Angulo de inclinacion brazos (dcha): ' + str(int(inclinacion_brazo_dcha))
             # Condiciones de deteccion de postura corporal
             # Determinar si la postura es buena o no
             # Los angulos del threshold han sido fijados tras varias pruebas
@@ -132,7 +132,7 @@ while(True):
             if inclinacion_muneca > 83 and inclinacion_muneca < 97 :
                 malos_frames = 0
                 buenos_frames += 1
-                cv2.putText(image, angle_text_string, (10, 30), font, 0.9, verde_claro, 2)
+                cv2.putText(image, angulo_string, (10, 30), font, 0.9, verde_claro, 2)
                 cv2.putText(image, str(int(inclinacion_muneca)), (muneca_izq_x + 10, muneca_izq_y), font, 0.9, verde_claro, 2)
                 # Union de puntos de referencia
                 cv2.line(image, (muneca_izq_x, muneca_izq_y), (muneca_dcha_x, muneca_dcha_y), verde, 4)
@@ -149,7 +149,7 @@ while(True):
                 buenos_frames = 0
                 malos_frames += 1
 
-                cv2.putText(image, angle_text_string, (10, 30), font, 0.9, rojo, 2)
+                cv2.putText(image, angulo_string, (10, 30), font, 0.9, rojo, 2)
                 cv2.putText(image, str(int(inclinacion_muneca)), (muneca_izq_x + 10, muneca_izq_y), font, 0.9, rojo, 2)
 
                 # Union de puntos de referencia

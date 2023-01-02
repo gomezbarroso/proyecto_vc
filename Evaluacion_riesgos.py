@@ -36,7 +36,7 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 
 # Inicializar videocapture
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 # Datos para el videowriter
 fps = int(cap.get(cv2.CAP_PROP_FPS))
