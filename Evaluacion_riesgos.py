@@ -4,32 +4,30 @@ import math as m
 import mediapipe as mp
 import os
 
-# Calcular distancia offset
-def findDistance(x1, y1, x2, y2):
+# Calcular distancia separacion
+def calc_dist(x1, y1, x2, y2):
     dist = m.sqrt((x2-x1)**2+(y2-y1)**2)
     return dist
 
 # Calcular inclinacion de la postura corporal
-def findAngle(x1, y1, x2, y2):
-    theta = m.acos((y2 - y1)*(-y1) / (m.sqrt((x2 - x1)**2 + (y2 - y1)**2) * y1))
-    degree = int(180/m.pi)*theta
-    return degree
+def calc_angulo(x1, y1, x2, y2):
+    alpha = m.acos((y2 - y1)*(-y1) / (m.sqrt((x2 - x1)**2 + (y2 - y1)**2) * y1))
+    grados = int(180/m.pi)*alpha
+    return grados
 
 # Inicializar los contadores de frames
-good_frames = 0
-bad_frames = 0
+buenos_frames = 0
+malos_frames = 0
 
 # Definir la fuente
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 # Definicion de colores
-blue = (255, 127, 0)
-red = (50, 50, 255)
-green = (127, 255, 0)
-dark_blue = (127, 20, 0)
-light_green = (127, 233, 100)
-yellow = (0, 255, 255)
-pink = (255, 0, 255)
+rojo = (50, 50, 255)
+verde = (125, 255, 0)
+verde_claro = (125, 235, 100)
+amarillo = (0, 255, 255)
+rosa = (255, 0, 255)
 
 # Inicializar la clase de pose de mediapipe
 mp_pose = mp.solutions.pose
@@ -73,91 +71,91 @@ while(True):
     if lm is not None:
         lmPose = mp_pose.PoseLandmark
         # Hombro izquierdo
-        l_shldr_x = int(lm.landmark[lmPose.LEFT_SHOULDER].x * width)
-        l_shldr_y = int(lm.landmark[lmPose.LEFT_SHOULDER].y * height)
+        hombro_izq_x = int(lm.landmark[lmPose.LEFT_SHOULDER].x * width)
+        hombro_izq_y = int(lm.landmark[lmPose.LEFT_SHOULDER].y * height)
 
         # Hombro derecho
-        r_shldr_x = int(lm.landmark[lmPose.RIGHT_SHOULDER].x * width)
-        r_shldr_y = int(lm.landmark[lmPose.RIGHT_SHOULDER].y * height)
+        hombro_dcha_x = int(lm.landmark[lmPose.RIGHT_SHOULDER].x * width)
+        hombro_dcha_y = int(lm.landmark[lmPose.RIGHT_SHOULDER].y * height)
 
         # Oreja izquierda
-        l_ear_x = int(lm.landmark[lmPose.LEFT_EAR].x * width)
-        l_ear_y = int(lm.landmark[lmPose.LEFT_EAR].y * height)
+        oreja_izq_x = int(lm.landmark[lmPose.LEFT_EAR].x * width)
+        oreja_izq_y = int(lm.landmark[lmPose.LEFT_EAR].y * height)
 
         # Cadera izquierda
-        l_hip_x = int(lm.landmark[lmPose.LEFT_HIP].x * width)
-        l_hip_y = int(lm.landmark[lmPose.LEFT_HIP].y * height)
+        cadera_izq_x = int(lm.landmark[lmPose.LEFT_HIP].x * width)
+        cadera_izq_y = int(lm.landmark[lmPose.LEFT_HIP].y * height)
 
         # Calcular la distancia entre los puntos del hombro izquierdo y el hombro derecho
-        offset = findDistance(l_shldr_x, l_shldr_y, r_shldr_x, r_shldr_y)
+        separacion = calc_dist(hombro_izq_x, hombro_izq_y, hombro_dcha_x, hombro_dcha_y)
 
         # Alinear la camara al punto de la vista lateral de la persona
-        # El parametro Offset threshold se ha fijado a 30 tras realizar diferentes pruebas
-        if offset < 100:
-            cv2.putText(image, str(int(offset)) + ' Alineado', (width - 175, 30), font, 0.9, green, 2)
+        # El parametro separacion threshold se ha fijado a 30 tras realizar diferentes pruebas
+        if separacion < 100:
+            cv2.putText(image, str(int(separacion)) + ' Alineado', (width - 175, 30), font, 0.9, verde, 2)
         else:
-            cv2.putText(image, str(int(offset)) + ' No alineado', (width - 255, 30), font, 0.9, red, 2)
+            cv2.putText(image, str(int(separacion)) + ' No alineado', (width - 255, 30), font, 0.9, rojo, 2)
 
         # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
         # Calcular angulos
-        neck_inclination = findAngle(l_shldr_x, l_shldr_y, l_ear_x, l_ear_y)
-        torso_inclination = findAngle(l_hip_x, l_hip_y, l_shldr_x, l_shldr_y)
+        inclinacion_cuello = calc_angulo(hombro_izq_x, hombro_izq_y, oreja_izq_x, oreja_izq_y)
+        inclinacion_torso = calc_angulo(cadera_izq_x, cadera_izq_y, hombro_izq_x, hombro_izq_y)
 
         # Pintar puntos de referencia
-        cv2.circle(image, (l_shldr_x, l_shldr_y), 7, yellow, -1)
-        cv2.circle(image, (l_ear_x, l_ear_y), 7, yellow, -1)
+        cv2.circle(image, (hombro_izq_x, hombro_izq_y), 7, amarillo, -1)
+        cv2.circle(image, (oreja_izq_x, oreja_izq_y), 7, amarillo, -1)
 
         # Pintamos los puntos de cadera y hombros en la imagen
-        cv2.circle(image, (l_shldr_x, l_shldr_y - 100), 7, yellow, -1)
-        cv2.circle(image, (r_shldr_x, r_shldr_y), 7, pink, -1)
-        cv2.circle(image, (l_hip_x, l_hip_y), 7, yellow, -1)
-        cv2.circle(image, (l_hip_x, l_hip_y - 100), 7, yellow, -1)
+        cv2.circle(image, (hombro_izq_x, hombro_izq_y - 100), 7, amarillo, -1)
+        cv2.circle(image, (hombro_dcha_x, hombro_dcha_y), 7, rosa, -1)
+        cv2.circle(image, (cadera_izq_x, cadera_izq_y), 7, amarillo, -1)
+        cv2.circle(image, (cadera_izq_x, cadera_izq_y - 100), 7, amarillo, -1)
 
         # Imprimimos el texto por pantalla, inclinacion de postura y angulos
-        angle_text_string = 'Cuello : ' + str(int(neck_inclination)) + '  Torso : ' + str(int(torso_inclination))
+        angle_text_string = 'Cuello : ' + str(int(inclinacion_cuello)) + '  Torso : ' + str(int(inclinacion_torso))
 
 
         # Condiciones de deteccion de postura corporal
         # Determinar si la postura es buena o no
         # Los angulos del threshold han sido fijados tras varias pruebas
-        if neck_inclination < 40 and torso_inclination < 10:
-            bad_frames = 0
-            good_frames += 1
+        if inclinacion_cuello < 40 and inclinacion_torso < 10:
+            malos_frames = 0
+            buenos_frames += 1
 
-            cv2.putText(image, angle_text_string, (10, 30), font, 0.9, light_green, 2)
-            cv2.putText(image, str(int(neck_inclination)), (l_shldr_x + 10, l_shldr_y), font, 0.9, light_green, 2)
-            cv2.putText(image, str(int(torso_inclination)), (l_hip_x + 10, l_hip_y), font, 0.9, light_green, 2)
+            cv2.putText(image, angle_text_string, (10, 30), font, 0.9, verde_claro, 2)
+            cv2.putText(image, str(int(inclinacion_cuello)), (hombro_izq_x + 10, hombro_izq_y), font, 0.9, verde_claro, 2)
+            cv2.putText(image, str(int(inclinacion_torso)), (cadera_izq_x + 10, cadera_izq_y), font, 0.9, verde_claro, 2)
             # Union de puntos de referencia
-            cv2.line(image, (l_shldr_x, l_shldr_y), (l_ear_x, l_ear_y), green, 4)
-            cv2.line(image, (l_shldr_x, l_shldr_y), (l_shldr_x, l_shldr_y - 100), green, 4)
-            cv2.line(image, (l_hip_x, l_hip_y), (l_shldr_x, l_shldr_y), green, 4)
-            cv2.line(image, (l_hip_x, l_hip_y), (l_hip_x, l_hip_y - 100), green, 4)
+            cv2.line(image, (hombro_izq_x, hombro_izq_y), (oreja_izq_x, oreja_izq_y), verde, 4)
+            cv2.line(image, (hombro_izq_x, hombro_izq_y), (hombro_izq_x, hombro_izq_y - 100), verde, 4)
+            cv2.line(image, (cadera_izq_x, cadera_izq_y), (hombro_izq_x, hombro_izq_y), verde, 4)
+            cv2.line(image, (cadera_izq_x, cadera_izq_y), (cadera_izq_x, cadera_izq_y - 100), verde, 4)
 
         else:
-            good_frames = 0
-            bad_frames += 1
+            buenos_frames = 0
+            malos_frames += 1
 
-            cv2.putText(image, angle_text_string, (10, 30), font, 0.9, red, 2)
-            cv2.putText(image, str(int(neck_inclination)), (l_shldr_x + 10, l_shldr_y), font, 0.9, red, 2)
-            cv2.putText(image, str(int(torso_inclination)), (l_hip_x + 10, l_hip_y), font, 0.9, red, 2)
+            cv2.putText(image, angle_text_string, (10, 30), font, 0.9, rojo, 2)
+            cv2.putText(image, str(int(inclinacion_cuello)), (hombro_izq_x + 10, hombro_izq_y), font, 0.9, rojo, 2)
+            cv2.putText(image, str(int(inclinacion_torso)), (cadera_izq_x + 10, cadera_izq_y), font, 0.9, rojo, 2)
 
             # Union de puntos de referencia
-            cv2.line(image, (l_shldr_x, l_shldr_y), (l_ear_x, l_ear_y), red, 4)
-            cv2.line(image, (l_shldr_x, l_shldr_y), (l_shldr_x, l_shldr_y - 100), red, 4)
-            cv2.line(image, (l_hip_x, l_hip_y), (l_shldr_x, l_shldr_y), red, 4)
-            cv2.line(image, (l_hip_x, l_hip_y), (l_hip_x, l_hip_y - 100), red, 4)
+            cv2.line(image, (hombro_izq_x, hombro_izq_y), (oreja_izq_x, oreja_izq_y), rojo, 4)
+            cv2.line(image, (hombro_izq_x, hombro_izq_y), (hombro_izq_x, hombro_izq_y - 100), rojo, 4)
+            cv2.line(image, (cadera_izq_x, cadera_izq_y), (hombro_izq_x, hombro_izq_y), rojo, 4)
+            cv2.line(image, (cadera_izq_x, cadera_izq_y), (cadera_izq_x, cadera_izq_y - 100), rojo, 4)
 
         # Calcular el tiempo que el sujeto esta en la postura actual
-        good_time = (1 / fps) * good_frames
-        bad_time = (1 / fps) * bad_frames
+        tiempo_correcto = (1 / fps) * buenos_frames
+        tiempo_incorrecto = (1 / fps) * malos_frames
 
         # Tiempo de pose
-        if good_time > 0:
-            time_string_good = 'Tiempo de postura correcta : ' + str(round(good_time, 1)) + 's'
-            cv2.putText(image, time_string_good, (10, height - 20), font, 0.9, green, 2)
+        if tiempo_correcto > 0:
+            tiempo_string_correcto = 'Tiempo de postura correcta : ' + str(round(tiempo_correcto, 1)) + 's'
+            cv2.putText(image, tiempo_string_correcto, (10, height - 20), font, 0.9, verde, 2)
         else:
-            time_string_bad = 'Tiempo de postura incorrecta : ' + str(round(bad_time, 1)) + 's'
-            cv2.putText(image, time_string_bad, (10, height - 20), font, 0.9, red, 2)
+            tiempo_string_incorrecto = 'Tiempo de postura incorrecta : ' + str(round(tiempo_incorrecto, 1)) + 's'
+            cv2.putText(image, tiempo_string_incorrecto, (10, height - 20), font, 0.9, rojo, 2)
 
     cv2.imshow('frame', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
