@@ -70,77 +70,75 @@ while(True):
 
     # Obtener los landmarks de los keypoints
     lm = keypoints.pose_landmarks
+    if lm is not None:
+        if lm.landmark[lmPose.LEFT_WRIST].visibility < 0.1:
+            not_found_string = 'Puntos no reconocidos'
+            cv2.putText(image, not_found_string, (10, 30), font, 0.9, red, 2)
 
-    if lm.landmark[lmPose.LEFT_WRIST].visibility < 0.1:
-        not_found_string = 'Puntos no reconocidos'
-        cv2.putText(image, not_found_string, (10, 30), font, 0.9, red, 2)
+        if lm.landmark[lmPose.LEFT_WRIST].visibility >= 0.1:
+            lmPose = mp_pose.PoseLandmark
+            #print(lm.landmark[lmPose.LEFT_WRIST])
 
-    if lm.landmark[lmPose.LEFT_WRIST].visibility >= 0.1:
-        lmPose = mp_pose.PoseLandmark
-        #print(lm.landmark[lmPose.LEFT_WRIST])
+            # Muñeca izquierda
+            l_wrist_x = int(lm.landmark[lmPose.LEFT_WRIST].x * width)
+            l_wrist_y = int(lm.landmark[lmPose.LEFT_WRIST].y * height)
 
-            
-
-        # Muñeca izquierda
-        l_wrist_x = int(lm.landmark[lmPose.LEFT_WRIST].x * width)
-        l_wrist_y = int(lm.landmark[lmPose.LEFT_WRIST].y * height)
-
-        # Muñeca derecha
-        r_wrist_x = int(lm.landmark[lmPose.RIGHT_WRIST].x * width)
-        r_wrist_y = int(lm.landmark[lmPose.RIGHT_WRIST].y * height)
-        
+            # Muñeca derecha
+            r_wrist_x = int(lm.landmark[lmPose.RIGHT_WRIST].x * width)
+            r_wrist_y = int(lm.landmark[lmPose.RIGHT_WRIST].y * height)
 
 
 
-        # Calcular la distancia entre los puntos del hombro izquierdo y el hombro derecho
-        offset = findDistance(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
 
-        # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
-        # Calcular angulos
-        wrist_inclination = findAngle(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
+            # Calcular la distancia entre los puntos del hombro izquierdo y el hombro derecho
+            offset = findDistance(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
 
-        # Pintar puntos de referencia
-        cv2.circle(image, (l_wrist_x, l_wrist_y), 7, yellow, -1)
+            # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
+            # Calcular angulos
+            wrist_inclination = findAngle(l_wrist_x, l_wrist_y, r_wrist_x, r_wrist_y)
 
-        # Pintamos los puntos de cadera y hombros en la imagen
-        cv2.circle(image, (r_wrist_x, r_wrist_y), 7, pink, -1)
+            # Pintar puntos de referencia
+            cv2.circle(image, (l_wrist_x, l_wrist_y), 7, yellow, -1)
 
-        # Imprimimos el texto por pantalla, inclinacion de postura y angulos
-        angle_text_string = 'Angulo de inclinacion con la vertical : ' + str(int(wrist_inclination))
+            # Pintamos los puntos de cadera y hombros en la imagen
+            cv2.circle(image, (r_wrist_x, r_wrist_y), 7, pink, -1)
 
-        # Condiciones de deteccion de postura corporal
-        # Determinar si la postura es buena o no
-        # Los angulos del threshold han sido fijados tras varias pruebas
-        if wrist_inclination > 83 and wrist_inclination < 97 :
-            bad_frames = 0
-            good_frames += 1
+            # Imprimimos el texto por pantalla, inclinacion de postura y angulos
+            angle_text_string = 'Angulo de inclinacion con la vertical : ' + str(int(wrist_inclination))
 
-            cv2.putText(image, angle_text_string, (10, 30), font, 0.9, light_green, 2)
-            cv2.putText(image, str(int(wrist_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, light_green, 2)
-            # Union de puntos de referencia
-            cv2.line(image, (l_wrist_x, l_wrist_y), (r_wrist_x, r_wrist_y), green, 4)
+            # Condiciones de deteccion de postura corporal
+            # Determinar si la postura es buena o no
+            # Los angulos del threshold han sido fijados tras varias pruebas
+            if wrist_inclination > 83 and wrist_inclination < 97 :
+                bad_frames = 0
+                good_frames += 1
 
-        else:
-            good_frames = 0
-            bad_frames += 1
+                cv2.putText(image, angle_text_string, (10, 30), font, 0.9, light_green, 2)
+                cv2.putText(image, str(int(wrist_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, light_green, 2)
+                # Union de puntos de referencia
+                cv2.line(image, (l_wrist_x, l_wrist_y), (r_wrist_x, r_wrist_y), green, 4)
 
-            cv2.putText(image, angle_text_string, (10, 30), font, 0.9, red, 2)
-            cv2.putText(image, str(int(wrist_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, red, 2)
+            else:
+                good_frames = 0
+                bad_frames += 1
 
-            # Union de puntos de referencia
-            cv2.line(image, (l_wrist_x, l_wrist_y), (r_wrist_x, r_wrist_y), red, 4)
+                cv2.putText(image, angle_text_string, (10, 30), font, 0.9, red, 2)
+                cv2.putText(image, str(int(wrist_inclination)), (l_wrist_x + 10, l_wrist_y), font, 0.9, red, 2)
 
-        # Calcular el tiempo que el sujeto esta en la postura actual
-        good_time = (1 / fps) * good_frames
-        bad_time = (1 / fps) * bad_frames
+                # Union de puntos de referencia
+                cv2.line(image, (l_wrist_x, l_wrist_y), (r_wrist_x, r_wrist_y), red, 4)
 
-        # Tiempo de pose
-        if good_time > 0:
-            time_string_good = 'Tiempo de postura correcta : ' + str(round(good_time, 1)) + 's'
-            cv2.putText(image, time_string_good, (10, height - 20), font, 0.9, green, 2)
-        else:
-            time_string_bad = 'Tiempo de postura incorrecta : ' + str(round(bad_time, 1)) + 's'
-            cv2.putText(image, time_string_bad, (10, height - 20), font, 0.9, red, 2)
+            # Calcular el tiempo que el sujeto esta en la postura actual
+            good_time = (1 / fps) * good_frames
+            bad_time = (1 / fps) * bad_frames
+
+            # Tiempo de pose
+            if good_time > 0:
+                time_string_good = 'Tiempo de postura correcta : ' + str(round(good_time, 1)) + 's'
+                cv2.putText(image, time_string_good, (10, height - 20), font, 0.9, green, 2)
+            else:
+                time_string_bad = 'Tiempo de postura incorrecta : ' + str(round(bad_time, 1)) + 's'
+                cv2.putText(image, time_string_bad, (10, height - 20), font, 0.9, red, 2)
 
     cv2.imshow('frame', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
