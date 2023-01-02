@@ -51,7 +51,7 @@ while(True):
     success, image = cap.read()
     if not success:
         print("Null.Frames")
-    # Get fps.
+    # Obtener fps
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # Convertir la imagen BGR a RGB.
@@ -84,17 +84,15 @@ while(True):
             muneca_dcha_x = int(lm.landmark[lmPose.RIGHT_WRIST].x * width)
             muneca_dcha_y = int(lm.landmark[lmPose.RIGHT_WRIST].y * height)
 
-            # Calcular la distancia entre los puntos del hombro izquierdo y el hombro derecho
+            # Calcular la distancia entre los puntos de la muñeca izquierda y la muñeca derecha
             separacion = calc_dist(muneca_izq_x, muneca_izq_y, muneca_dcha_x, muneca_dcha_y)
 
             # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
             # Calcular angulos
             inclinacion_muneca = calc_angulo(muneca_izq_x, muneca_izq_y, muneca_dcha_x, muneca_dcha_y)
 
-            # Pintar puntos de referencia
+            # Pintamos los puntos de las muñecas en la imagen
             cv2.circle(image, (muneca_izq_x, muneca_izq_y), 7, amarillo, -1)
-
-            # Pintamos los puntos de cadera y hombros en la imagen
             cv2.circle(image, (muneca_dcha_x, muneca_dcha_y), 7, rosa, -1)
 
             # Imprimimos el texto por pantalla, inclinacion de postura y angulos

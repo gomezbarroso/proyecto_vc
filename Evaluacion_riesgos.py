@@ -51,7 +51,7 @@ while(True):
     success, image = cap.read()
     if not success:
         print("Null.Frames")
-    # Get fps.
+    # Obtener fps
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     # Convertir la imagen BGR a RGB.
