@@ -1,8 +1,6 @@
 import cv2
-import time
 import math as m
 import mediapipe as mp
-import os
 
 # Calcular distancia separacion
 def calc_dist(x1, y1, x2, y2):
