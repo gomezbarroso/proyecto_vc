@@ -25,7 +25,6 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 # Definicion de colores
 rojo = (50, 50, 255)
 verde = (125, 255, 0)
-verde_claro = (125, 235, 100)
 amarillo = (0, 255, 255)
 rosa = (255, 0, 255)
 
@@ -107,6 +106,13 @@ while(True):
             # Calcular la distancia entre los puntos de la muñeca izquierda y la muñeca derecha
             separacion = calc_dist(muneca_izq_x, muneca_izq_y, muneca_dcha_x, muneca_dcha_y)
 
+            # Alinear la camara al punto de la vista frontal de la persona
+            # El parametro separacion threshold se ha fijado a 30 tras realizar diferentes pruebas
+            if separacion > 200:
+                cv2.putText(image, str(int(separacion)) + ' Alineado', (10, 60), font, 0.9, verde, 2)
+            else:
+                cv2.putText(image, str(int(separacion)) + ' No alineado', (10, 60), font, 0.9, rojo, 2)
+
             # Calcular la inclinacion de la postura corporal y pintar los puntos de referencia
             # Calcular angulos
             inclinacion_muneca = calc_angulo(muneca_izq_x, muneca_izq_y, muneca_dcha_x, muneca_dcha_y)
@@ -132,8 +138,8 @@ while(True):
             if inclinacion_muneca > 83 and inclinacion_muneca < 97 :
                 malos_frames = 0
                 buenos_frames += 1
-                cv2.putText(image, angulo_string, (10, 30), font, 0.9, verde_claro, 2)
-                cv2.putText(image, str(int(inclinacion_muneca)), (muneca_izq_x + 10, muneca_izq_y), font, 0.9, verde_claro, 2)
+                cv2.putText(image, angulo_string, (10, 30), font, 0.9, verde, 2)
+                cv2.putText(image, str(int(inclinacion_muneca)), (muneca_izq_x + 10, muneca_izq_y), font, 0.9, verde, 2)
                 # Union de puntos de referencia
                 cv2.line(image, (muneca_izq_x, muneca_izq_y), (muneca_dcha_x, muneca_dcha_y), verde, 4)
                 cv2.line(image, (muneca_izq_x, muneca_izq_y), (codo_izq_x, codo_izq_y), verde, 4)
