@@ -35,7 +35,7 @@ contador = 0
 estado = None
 
 # Inicializar videocapture
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Datos para el videowriter
 fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -148,7 +148,7 @@ while(True):
                     estado = "abajo"
                 if inclinacion_brazo_izq < 90 and inclinacion_brazo_dcha < 90 and estado == 'abajo':
                     estado = "arriba"
-                    contador +=1
+                    contador += 1
             else:
                 buenos_frames = 0
                 malos_frames += 1
@@ -175,7 +175,8 @@ while(True):
                 tiempo_string_incorrecto = 'Tiempo de postura incorrecta : ' + str(round(tiempo_incorrecto, 1)) + 's'
                 cv2.putText(image, tiempo_string_incorrecto, (10, height - 20), font, 0.9, rojo, 2)
 
-            cv2.putText(image, str(contador), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(image, str(contador), (500, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2, cv2.LINE_AA)
+
     cv2.imshow('frame', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
