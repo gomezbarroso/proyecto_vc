@@ -159,7 +159,6 @@ while(True):
                 cv2.line(image, (codo_izq_x, codo_izq_y), (hombro_izq_x, hombro_izq_y), rojo, 4)
                 cv2.line(image, (codo_dcha_x, codo_dcha_y), (hombro_dcha_x, hombro_dcha_y), rojo, 4)
 
-
             # Calcular el tiempo que el sujeto esta en la postura actual
             tiempo_correcto = (1 / fps) * buenos_frames
             tiempo_incorrecto = (1 / fps) * malos_frames
